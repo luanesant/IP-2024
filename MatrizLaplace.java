@@ -1,5 +1,5 @@
-import java.util.Scanner;
 import java.util.Random;
+import java.util.Scanner;
 
 public class MatrizLaplace{
     private int[][]  matriz;
@@ -59,16 +59,20 @@ public class MatrizLaplace{
                 if(this.getElemento(linha, coluna) == 0){
                     contaQtdDeZeroLinha++;
                 }
+                if (contaQtdDeZeroLinha > qtdDeZeroLinha){
+                    qtdDeZeroLinha = contaQtdDeZeroLinha;
+                    linhaMaiorQtdZero = linha;
+                    contaQtdDeZeroLinha = 0;
+                }
 			}
-
-            if (contaQtdDeZeroLinha > qtdDeZeroLinha){
-                qtdDeZeroLinha = contaQtdDeZeroLinha;
-                linhaMaiorQtdZero = linha;
-                contaQtdDeZeroLinha = 0;
-            }
 		}
 
-        System.out.println("Linha com + 0: " + linhaMaiorQtdZero);
+        if (linhaMaiorQtdZero>0) {
+            System.out.println("Linha com + 0: " + linhaMaiorQtdZero);
+
+        }else{
+            System.out.println("Não tem linha com 0");
+        }
     }
 
     public static void main(String[] args){
@@ -77,13 +81,13 @@ public class MatrizLaplace{
         System.out.println("Escolha a ordem: ");
         mat.setOrdem(scanner.nextInt());
         int entrada;
-        for(int i = 0; i < mat.getOrdem(); i++){
+    /*     for(int i = 0; i < mat.getOrdem(); i++){
 			for(int j = 0; j < mat.getOrdem(); j++){
 				entrada = scanner.nextInt();
 				mat.setElemento(i,j,entrada);
 			}
-		}
-
+		} */
+        mat.initRandom();
         mat.imprimeMatriz();
         mat.checkLinhaComMaisZero();
     }
