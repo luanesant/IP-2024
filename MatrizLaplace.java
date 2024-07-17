@@ -88,23 +88,29 @@ public class MatrizLaplace{
         if (linhaMaiorQtdZero>0) {
             mat.setLinhaComMaisZero(linhaMaiorQtdZero);
         }
-        
     }
 
+    public void checkColunaComMaisZero(MatrizLaplace mat){
+        int colunaMaiorQtdZero = 0;
+        int contaQtdDeZeroColuna = 0;
+        int qtdDeZeroColuna = 0;
 
-    public boolean verificaTemZero(MatrizLaplace mat){
-        boolean temZero = false;
-
-        for(int linha = 0; linha < this.getOrdem(); linha++){
-			for(int coluna = 0; coluna < this.getOrdem(); coluna++){
+        for(int coluna = 0; coluna < mat.getOrdem(); coluna++){
+            for(int linha = 0; linha < mat.getOrdem(); linha++){
                 if(this.getElemento(linha, coluna) == 0){
-                    temZero = true;
-                    break;
+                    contaQtdDeZeroColuna++;
+                }
+                if (contaQtdDeZeroColuna > qtdDeZeroColuna){
+                    qtdDeZeroColuna = contaQtdDeZeroColuna;
+                    colunaMaiorQtdZero = coluna;
+                    contaQtdDeZeroColuna = 0;
                 }
 			}
 		}
 
-        return temZero;
+        if (colunaMaiorQtdZero>0) {
+            mat.setColunaComMaisZero(colunaMaiorQtdZero);
+        }
     }
 
 	public void copiaMatrizGrandeParaMatrizPequena(MatrizLaplace matGrande, MatrizLaplace matPequena, int linhaProibida, int colunaProibida){
@@ -125,12 +131,12 @@ public class MatrizLaplace{
 		}
 	}
 	
-	public float detLaPlaceRecursivo(MatrizLaplace mat, int linha, int coluna){
+	public float detLaPlaceRecursivoLinha(MatrizLaplace mat, int linha){
 		MatrizLaplace matLinha = new MatrizLaplace(mat.getOrdem()-1);	
 		
 		float acum = 0.0f;
-		int contColuna;
-		for(contColuna = 0; contColuna < mat.getOrdem(); contColuna++){	
+
+		for(int contColuna = 0; contColuna < mat.getOrdem(); contColuna++){	
 			matLinha.copiaMatrizGrandeParaMatrizPequena(mat,matLinha,linha,contColuna);
 			System.out.println(linha + " , " + contColuna);
 			matLinha.imprimeMatriz();
@@ -140,8 +146,23 @@ public class MatrizLaplace{
 			        detLaPlace(matLinha));
 		}	
 		return acum;	
+	}	
+    	
+	public float detLaPlaceRecursivoColuna(MatrizLaplace mat, int coluna){
+		MatrizLaplace matLinha = new MatrizLaplace(mat.getOrdem()-1);	
+		
+		float acum = 0.0f;
+
+		for(int linha = 0; linha < mat.getOrdem(); linha++){	
+			matLinha.copiaMatrizGrandeParaMatrizPequena(mat,matLinha,linha,coluna);
+			acum = acum +
+			      (float)(mat.getElemento(linha,coluna) *
+			        Math.pow(-1, linha+coluna) *
+			        detLaPlace(matLinha));
+		}	
+		return acum;	
 	}
-	
+
 	public float detLaPlace(MatrizLaplace mat){
 	
 		int contOrdem;
@@ -151,7 +172,11 @@ public class MatrizLaplace{
 			resultado = mat.getElemento(0,0);
 		}
 		else{
-			resultado = mat.detLaPlaceRecursivo(mat, mat.getLinhaComMaisZero(), 0);
+                if (mat.getLinhaComMaisZero() > mat.getColunaComMaisZero()){       
+			        resultado = mat.detLaPlaceRecursivoLinha(mat, mat.getLinhaComMaisZero());
+                }else{
+                    resultado = mat.detLaPlaceRecursivoColuna(mat, mat.getColunaComMaisZero());
+                }
 		}
 		
 		return resultado;
@@ -166,20 +191,22 @@ public class MatrizLaplace{
         Scanner scanner = new Scanner(System.in);
         System.out.println("Escolha a ordem: ");
         mat.setOrdem(scanner.nextInt());
-       /*   int entrada;
-       for(int i = 0; i < mat.getOrdem(); i++){
-			for(int j = 0; j < mat.getOrdem(); j++){
-				entrada = scanner.nextInt();
-				mat.setElemento(i,j,entrada);
-			}
-		} */
-        mat.initRandom();
-        mat.imprimeMatriz();
-        if(mat.verificaTemZero(mat)){
-            mat.checkLinhaComMaisZero(mat);
-        }
 
-        System.err.println("Linha com + 0: " + mat.getLinhaComMaisZero());
+      //  mat.initRandom();
+        for(int linha = 0; linha < mat.getOrdem(); linha++){
+			for(int coluna = 0; coluna < mat.getOrdem(); coluna++){
+                mat.setElemento(linha, coluna, scanner.nextInt());
+			}
+		}
+
+        mat.checkLinhaComMaisZero(mat);
+        mat.checkColunaComMaisZero(mat);
+
+        mat.imprimeMatriz();
+        
         System.out.println("Determinante: " + mat.detLaPlace());
+        System.err.println("Linha com + 0: " + mat.getLinhaComMaisZero());
+        System.err.println("Coluna com + 0: " + mat.getColunaComMaisZero());
+
     }
 }
